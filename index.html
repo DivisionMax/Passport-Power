@@ -27,17 +27,18 @@
     <div id="canvas"></div>
     
     <script>
+        var lower_middle_income;
+        var upper_middle_income;
+        var high_income;
+        
         d3.json("data.json", function (error, data){
           numbers = data;
 
-          var maxGDP = d3.max(numbers,
-            function (d) {
-              return d.GDPPerCapita;
-            });
+          var maxGDP = d3.max(numbers, function (d) { return d.GDPPerCapita; });
           
-          var lower_middle_income = maxGDP * 1/4 //between 50% and 25%
-          var upper_middle_income = maxGDP * 1/2 //between 50% and 75%
-          var high_income = maxGDP * 3/4 //above 75%
+          lower_middle_income = maxGDP * 1/4 //between 50% and 25%
+          upper_middle_income = maxGDP * 1/2 //between 50% and 75%
+          high_income = maxGDP * 3/4 //above 75%
           
           var svg = d3.select("#canvas").append("svg")
           .attr("height", 550)
@@ -49,58 +50,55 @@
               height = 600;
           var projection = d3.geo.equirectangular();
           var path = d3.geo.path().projection(projection);
-        
-          // Save a reference to the data outside the scope of the d3.json() function.
-          var worldData;
-  
-          var continentColor = function(income){
-              if (income > high_income){
-                          return "#458B00"; //high income
-                      }
-                      else if (income > upper_middle_income && income < high_income) {
-                          return "#9CBA7F"; //upper middle income
-                      }
-                      else if (income > lower_middle_income && income < high_income) {
-                          return "#FF8E7A"; //lower middle income
-                      }
-                      else{
-                          return "#CC4F39"; //low income
-                      }
-          };
           
-          //Developing the map for the legend
-          d3.json("country_continent.json", function (error, data){
-                  continents = data;
+          var countryColor = function(income){
+            if (income == "high"){
+                return "#458B00"; //high income
+              }
+              else if (income == "upper") {
+                return "#9CBA7F"; //upper middle income
+              }
+              else if (income == "lower") {
+                return "#FF8E7A"; //lower middle income
+              }
+              else{
+                return "#CC4F39"; //low income
+              }
+          };
                   
-                  function getContinent(code) {
-                       for (var i = 0; i < continents.length; i++) {
-                          if (continents[i].iso3_digit_code==code){
-                              return continents[i].continent;
-                          }
-                      }   
-                      return "";          
-                  }
-  
-                  d3.json("world-50m.json", function(error, world) {
-                  worldData = world;
-                  
-                  var countries = topojson.feature(world, world.objects.countries).features;
-                  
-                  g.selectAll("path")
-                      .data(countries)
-                      .enter().append("path")
-                      .attr("d", path)
-                      .style("fill", function (d) {return continentColor(getContinent(d.id))} )
-                      .style("stroke", "#888");
-  
-                  g.append("rect").attr("y",0)
-                     .attr("x",0)
-                     .attr("height", height)
-                     .attr("width",width)
-                     .style("fill","none")
-                     .style("stroke","black");
-                  });
-           });
+          var worldData;
+          
+          d3.json("test.json", function (error, data){
+                groups = data;
+                
+                function getIncomeGroup(code) {
+                     for (var i = 0; i < groups.length; i++) {
+                        if (groups[i].iso3_digit_code == code){
+                            return groups[i].group;
+                        }
+                    }   
+                    return "";          
+                }
+
+            d3.json("world-50m.json", function(error, world) {
+              worldData = world;
+            
+              // Use topojson to create an array containing one object per country.
+              var countries = topojson.feature(world, world.objects.countries).features;
+              
+              g.selectAll("path")
+                .data(countries)
+                .enter().append("path")
+                .attr("d", path)
+                .style("fill", function (d) {return countryColor(getIncomeGroup(d.id))} )
+                .style("stroke", "#888")
+                .on("mouseover", function (country) {
+                  // When we hover over a country, show the user that country's ISO-3166 id.
+                  //d3.select("#countryid").text(country.id);
+                });
+            
+            });
+          });
         });
     </script>
   </body>

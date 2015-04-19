@@ -1,0 +1,13 @@
+[{"CountryName":"Afghanistan","iso3_digit_code":4,"group":"low"},
+{"CountryName":"Albania","iso3_digit_code":8,"group":"low"},
+{"CountryName":"Algeria","iso3_digit_code":12,"group":"low"},
+{"CountryName":"American Samoa","iso3_digit_code":16,"group":"lower"},
+{"CountryName":"Andorra","iso3_digit_code":20,"group":"lower"},
+{"CountryName":"Angola","iso3_digit_code":24,"group":""},
+{"CountryName":"Anguilla","iso3_digit_code":660,"group":""},
+{"CountryName":"Antigua and Barbuda","iso3_digit_code":28,"group":""},
+{"CountryName":"Argentina","iso3_digit_code":32,"group":""},
+{"CountryName":"Armenia","iso3_digit_code":51,"group":""},
+{"CountryName":"Aruba","iso3_digit_code":533,"group":""},
+{"CountryName":"Australia","iso3_digit_code":36,"group":"high"},
+{"CountryName":"Austria","iso3_digit_code":40,"group":"high"}]
