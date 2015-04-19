@@ -22,7 +22,7 @@
 
   <body>
     <h2>Passport Power</h2>
-
+    <div id="countryid"></div>
     <!-- SVG element-->
     <div id="canvas"></div>
     
@@ -87,25 +87,43 @@
            return "";          
           }
           
+          function getCoordinates(code) {
+            for (var i = 0; i < numbers.length; i++){
+              return projection([numbers[i].long, numbers[i].lat]);
+            }
+            return projection([0,0]);
+          }
+          
+          function getCountryname(code) {
+            for (var i = 0; i < numbers.length; i++){
+              if (numbers[i].iso3_digit_code == code){
+                return numbers[i].country_name;
+              }
+            
+            }
+            return "error";
+          }
+              
           var worldData;
           
           d3.json("world-50m.json", function(error, world) {
             worldData = world;
-          
-            // Use topojson to create an array containing one object per country.
-            var countries = topojson.feature(world, world.objects.countries).features;
-            
-            g.selectAll("path")
-              .data(countries)
-              .enter().append("path")
-              .attr("d", path)
-              .style("fill", function (d) {return countryColor(getIncomeGroup(d.id))} )
-              .style("stroke", "#888")
-              .on("mouseover", function (country) {
-                // When we hover over a country, show the user that country's ISO-3166 id.
-                //d3.select("#countryid").text(country.id);
-              });
-          
+              // Use topojson to create an array containing one object per country.
+              var countries = topojson.feature(world, world.objects.countries).features;
+              
+              g.selectAll("path")
+                .data(countries)
+                .enter().append("path")
+                .attr("d", path)
+                .style("fill", function (d) {return countryColor(getIncomeGroup(d.id))} )
+                .style("stroke", "#888")
+                .on("click", function (d) { //click to show country name
+                  svg.append("text")
+                  .attr("x", getCoordinates(d.id)[0])
+                  .attr("y", getCoordinates(d.id)[1])
+                  .text(getCountryname(d.id))
+                  .attr("fill", "black");
+                });
           });
         });
     </script>

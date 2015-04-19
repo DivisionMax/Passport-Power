@@ -1,7 +1,7 @@
-[{"CountryName":"Afghanistan","iso3_digit_code":4,"group":null,"GDPPerCapita":1946.19},
-{"CountryName":"Albania","iso3_digit_code":8,"group":null,"GDPPerCapita":9930.94},
-{"CountryName":"Algeria","iso3_digit_code":12,"group":null,"GDPPerCapita":5360.7},
-{"CountryName":"Andorra","iso3_digit_code":20,"group":null,"GDPPerCapita":46418.42},
-{"CountryName":"Australia","iso3_digit_code":36,"group":null,"GDPPerCapita":43202.37},
-{"CountryName":"Austria","iso3_digit_code":40,"group":null,"GDPPerCapita":45079.09},
-{"CountryName":"Luxembourg","iso3_digit_code":442,"group":null,"GDPPerCapita":110664.8}]
+[{"country_name":"Afghanistan","iso3_digit_code":4,"group":null,"GDPPerCapita":1946.19},
+{"country_name":"Albania","iso3_digit_code":8,"group":null,"GDPPerCapita":9930.94},
+{"country_name":"Algeria","iso3_digit_code":12,"group":null,"GDPPerCapita":5360.7},
+{"country_name":"Andorra","iso3_digit_code":20,"group":null,"GDPPerCapita":46418.42},
+{"country_name":"Australia","iso3_digit_code":36,"group":null,"GDPPerCapita":43202.37},
+{"country_name":"Austria","iso3_digit_code":40,"group":null,"GDPPerCapita":45079.09},
+{"country_name":"","iso3_digit_code":null,"group":null,"GDPPerCapita":null}]
