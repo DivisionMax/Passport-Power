@@ -30,24 +30,25 @@
         var lower_middle_income;
         var upper_middle_income;
         var high_income;
+        var avg;
         
-        d3.json("data.json", function (error, data){
+        d3.json("test.json", function (error, data){
           numbers = data;
-
-          var maxGDP = d3.max(numbers, function (d) { return d.GDPPerCapita; });
           
-          lower_middle_income = maxGDP * 1/4 //between 50% and 25%
-          upper_middle_income = maxGDP * 1/2 //between 50% and 75%
-          high_income = maxGDP * 3/4 //above 75%
+          avg = d3.sum(numbers, function(d) {return d.GDPPerCapita} ) / numbers.length;
           
+          lower_middle_income = avg * 3/4
+          upper_middle_income = avg * 1.25
+          high_income = avg * 1.5
+          
+          var width = 1400,
+              height = 600;
           var svg = d3.select("#canvas").append("svg")
-          .attr("height", 550)
-          .attr("width", 1150);
+                    .attr("height", height)
+                    .attr("width", width);
   
           var g = svg.append("g");
-          
-          var width = 1000,
-              height = 600;
+
           var projection = d3.geo.equirectangular();
           var path = d3.geo.path().projection(projection);
           
@@ -65,39 +66,46 @@
                 return "#CC4F39"; //low income
               }
           };
-                  
+          
+          function getIncomeGroup(code) {
+            for (var i = 0; i < numbers.length; i++) {
+               if (numbers[i].iso3_digit_code == code){
+                 if (numbers[i].GDPPerCapita >= high_income) {
+                   return "high";
+                 }
+                 else if (numbers[i].GDPPerCapita >= upper_middle_income && numbers[i].GDPPerCapita < high_income) {
+                   return "upper";
+                 }
+                 else if (numbers[i].GDPPerCapita >= lower_middle_income && numbers[i].GDPPerCapita < upper_middle_income) {
+                   return "lower";
+                 }
+                 else{
+                   return "low";
+                 }
+               }
+           }   
+           return "";          
+          }
+          
           var worldData;
           
-          d3.json("test.json", function (error, data){
-                groups = data;
-                
-                function getIncomeGroup(code) {
-                     for (var i = 0; i < groups.length; i++) {
-                        if (groups[i].iso3_digit_code == code){
-                            return groups[i].group;
-                        }
-                    }   
-                    return "";          
-                }
-
-            d3.json("world-50m.json", function(error, world) {
-              worldData = world;
+          d3.json("world-50m.json", function(error, world) {
+            worldData = world;
+          
+            // Use topojson to create an array containing one object per country.
+            var countries = topojson.feature(world, world.objects.countries).features;
             
-              // Use topojson to create an array containing one object per country.
-              var countries = topojson.feature(world, world.objects.countries).features;
-              
-              g.selectAll("path")
-                .data(countries)
-                .enter().append("path")
-                .attr("d", path)
-                .style("fill", function (d) {return countryColor(getIncomeGroup(d.id))} )
-                .style("stroke", "#888")
-                .on("mouseover", function (country) {
-                  // When we hover over a country, show the user that country's ISO-3166 id.
-                  //d3.select("#countryid").text(country.id);
-                });
-            
-            });
+            g.selectAll("path")
+              .data(countries)
+              .enter().append("path")
+              .attr("d", path)
+              .style("fill", function (d) {return countryColor(getIncomeGroup(d.id))} )
+              .style("stroke", "#888")
+              .on("mouseover", function (country) {
+                // When we hover over a country, show the user that country's ISO-3166 id.
+                //d3.select("#countryid").text(country.id);
+              });
+          
           });
         });
     </script>
