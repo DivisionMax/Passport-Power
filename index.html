@@ -117,12 +117,21 @@
                 .attr("d", path)
                 .style("fill", function (d) {return countryColor(getIncomeGroup(d.id))} )
                 .style("stroke", "#888")
-                .on("click", function (d) { //click to show country name
-                  svg.append("text")
-                  .attr("x", getCoordinates(d.id)[0])
-                  .attr("y", getCoordinates(d.id)[1])
-                  .text(getCountryname(d.id))
-                  .attr("fill", "black");
+                .on("click", function (d) {
+                    //click to show country name and location
+                    svg.append("circle")
+                    .attr("cx", getCoordinates(d.id)[0])
+                    .attr("cy", getCoordinates(d.id)[1])
+                    .attr("r", 5)
+                    .attr("fill", "black");
+                    svg.append("text")
+                    .attr("x", getCoordinates(d.id)[0])
+                    .attr("y", getCoordinates(d.id)[1])
+                    .text(getCountryname(d.id))
+                    .attr("fill", "black");
+                    
+                    //click to enlarge country
+                    
                 });
           });
         });
