@@ -35,9 +35,9 @@
         d3.json("test.json", function (error, data){
           numbers = data;
           
-          avg = d3.sum(numbers, function(d) {return d.GDPPerCapita} ) / numbers.length;
+          avg = d3.sum(numbers, function(d) {return d.gdp_percapita} ) / numbers.length;
           
-          lower_middle_income = avg * 3/4
+          lower_middle_income = avg
           upper_middle_income = avg * 1.25
           high_income = avg * 1.5
           
@@ -70,13 +70,13 @@
           function getIncomeGroup(code) {
             for (var i = 0; i < numbers.length; i++) {
                if (numbers[i].iso3_digit_code == code){
-                 if (numbers[i].GDPPerCapita >= high_income) {
+                 if (numbers[i].gdp_percapita >= high_income) {
                    return "high";
                  }
-                 else if (numbers[i].GDPPerCapita >= upper_middle_income && numbers[i].GDPPerCapita < high_income) {
+                 else if (numbers[i].gdp_percapita >= upper_middle_income && numbers[i].gdp_percapita < high_income) {
                    return "upper";
                  }
-                 else if (numbers[i].GDPPerCapita >= lower_middle_income && numbers[i].GDPPerCapita < upper_middle_income) {
+                 else if (numbers[i].gdp_percapita >= lower_middle_income && numbers[i].gdp_percapita < upper_middle_income) {
                    return "lower";
                  }
                  else{
@@ -89,9 +89,11 @@
           
           function getCoordinates(code) {
             for (var i = 0; i < numbers.length; i++){
-              return projection([numbers[i].long, numbers[i].lat]);
+              if (numbers[i].iso3_digit_code == code){
+                return projection([numbers[i].long, numbers[i].lat]);
+              }
             }
-            return projection([0,0]);
+            return projection([0, 0]);
           }
           
           function getCountryname(code) {
@@ -118,17 +120,13 @@
                 .style("fill", function (d) {return countryColor(getIncomeGroup(d.id))} )
                 .style("stroke", "#888")
                 .on("click", function (d) {
-                    //click to show country name and location
-                    svg.append("circle")
-                    .attr("cx", getCoordinates(d.id)[0])
-                    .attr("cy", getCoordinates(d.id)[1])
-                    .attr("r", 5)
-                    .attr("fill", "black");
+                    //click to show country name
                     svg.append("text")
                     .attr("x", getCoordinates(d.id)[0])
                     .attr("y", getCoordinates(d.id)[1])
                     .text(getCountryname(d.id))
                     .attr("fill", "black");
+                    //next click removes first click
                     
                     //click to enlarge country
                     
