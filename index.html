@@ -11,6 +11,10 @@
           stroke: #fff;
           stroke-width: 1.2px;
         }
+        #explanation {
+          font-family: Helvetica;
+          margin: 10px 10%;
+        }
         #container {
           margin:10px 10%;
           padding:20px;
@@ -35,7 +39,17 @@
   </head>
 
   <body>
-    <h2>Passport Power</h2>
+    <div id="explanation">
+      <h3 style=" font-size: 36px; text-align: center;">Passport Power</h3>
+      <p>How many countries can you travel to with your passport? <br>
+        Our visualization explores the power of passports. The lines that shoot out from a country when clicked represent
+        point out the countries you are able to travel to <b>visa-free</b>! <br>
+        Upon clicking, you can see the country name and the region as well as the number of incoming tourists per year to this
+        country. <br>
+        The colors of each line correspond to the nubmer of outgoing tourists from the selected country each year.
+        The darker the color, the more outgoing tourists.</p>
+      
+    </div>
     
     <div id="container"></div>
     
@@ -155,6 +169,16 @@
             return "error";
           }
           
+          function getIncomingTourists(code) {
+            for (var i = 0; i < numbers.length; i++){
+              if (numbers[i].iso3_digit_code == code){
+                return numbers[i].incoming;
+              }
+            
+            }
+            return "Unknown";
+          }
+          
           var worldData;
           d3.json("world-topo.json", function(error, world) {
             worldData = world;
@@ -183,7 +207,7 @@
                       tooltip
                         .classed("hidden", false)
                         .attr("style", "left:"+(mouse[0]+offsetL)+"px;top:"+(mouse[1]+offsetT)+"px")
-                        .html(getCountryname(d.id))
+                        .html(getCountryname(d.id) + " <br> Incoming Tourists/Year: " + getIncomingTourists(d.id))
                     })
                     .on("mouseout",  function(d,i) {
                       tooltip.classed("hidden", true)
