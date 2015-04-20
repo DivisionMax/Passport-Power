@@ -54,12 +54,18 @@
     <div id="container"></div>
     
     <script>
-        //Part of the code taken from: http://techslides.com/responsive-d3-map-with-zoom-and-pan-limits
-        d3.select(window).on("resize", throttle);
-
-        var zoom = d3.behavior.zoom()
-            .scaleExtent([1, 8])
-
+        var lower_middle_income;
+        var upper_middle_income;
+        var high_income;
+        var avg;
+        
+        d3.json("test.json", function (error, data){
+          //Part of the code taken from: http://techslides.com/responsive-d3-map-with-zoom-and-pan-limits
+          d3.select(window).on("resize", throttle);
+  
+          var zoom = d3.behavior.zoom()
+              .scaleExtent([1, 8])
+  
           var throttleTimer;
           function throttle() {
             window.clearTimeout(throttleTimer);
@@ -67,43 +73,40 @@
                 redraw();
               }, 200);
           }
+  
+          var width = document.getElementById('container').offsetWidth-60;
+          var height = width / 2;
+          
+          var topo,projection,path,svg,g;
+          
+          var tooltip = d3.select("#container").append("div").attr("class", "tooltip hidden");
+          
+          setup(width,height);
+          
+          function setup(width,height){
+            projection = d3.geo.mercator()
+              .translate([0, 0])
+              .scale(width / 2 / Math.PI);
+          
+            path = d3.geo.path()
+                .projection(projection);
+          
+            svg = d3.select("#container").append("svg")
+                .attr("width", width)
+                .attr("height", height)
+                .append("g")
+                .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
+                .call(zoom);
+          
+            g = svg.append("g");
+          }
 
-        var width = document.getElementById('container').offsetWidth-60;
-        var height = width / 2;
-        
-        var topo,projection,path,svg,g;
-        
-        var tooltip = d3.select("#container").append("div").attr("class", "tooltip hidden");
-        
-        setup(width,height);
-        
-        function setup(width,height){
-          projection = d3.geo.mercator()
-            .translate([0, 0])
-            .scale(width / 2 / Math.PI);
-        
-          path = d3.geo.path()
-              .projection(projection);
-        
-          svg = d3.select("#container").append("svg")
-              .attr("width", width)
-              .attr("height", height)
-              .append("g")
-              .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
-              .call(zoom);
-        
-          g = svg.append("g");
-        }
-
-        var lower_middle_income;
-        var upper_middle_income;
-        var high_income;
-        var avg;
-        
-        d3.json("test.json", function (error, data){
           numbers = data;
           
-          avg = d3.sum(numbers, function(d) {return d.gdp_percapita} ) / numbers.length;
+          maxGDP = d3.max(numbers, function(d) {return d.gdp_percapita});
+          minGDP = d3.min(numbers, function(d) {return d.gdp_percapita});
+          sumGDP = d3.sum(numbers, function(d) {return d.gdp_percapita} ) - maxGDP - minGDP;
+          avg =  sumGDP / (numbers.length - 2);
           
           lower_middle_income = avg * 3/4
           upper_middle_income = avg
@@ -143,11 +146,20 @@
                    return "low";
                  }
                  else{
-                   return "unknown";
+                   return "No Available Data";
                  }
                }
            }   
-           return "";          
+           return "No Available Data";          
+          }
+          
+          function getIncome(code) {
+            for (var i = 0; i < numbers.length; i++){
+              if (numbers[i].iso3_digit_code == code){
+                return numbers[i].gdp_percapita;
+              }
+            }
+            return "No Available Data";
           }
           
           function getCoordinates(code) {
@@ -166,7 +178,7 @@
               }
             
             }
-            return "error";
+            return "Unknown";
           }
           
           function getIncomingTourists(code) {
@@ -176,7 +188,7 @@
               }
             
             }
-            return "Unknown";
+            return "No Available Data";
           }
           
           var worldData;
@@ -187,7 +199,6 @@
               topo = countries;
               draw(topo);
           });
-          
           function draw(topo) {
             var country = g.selectAll(".country").data(topo);
             
@@ -207,14 +218,16 @@
                       tooltip
                         .classed("hidden", false)
                         .attr("style", "left:"+(mouse[0]+offsetL)+"px;top:"+(mouse[1]+offsetT)+"px")
-                        .html(getCountryname(d.id) + " <br> Incoming Tourists/Year: " + getIncomingTourists(d.id))
+                        .html(getCountryname(d.id) +
+                              " <br> GDP per Capita: " + getIncome(d.id) +
+                              " <br> Incoming Tourists/Year: " + getIncomingTourists(d.id))
                     })
                     .on("mouseout",  function(d,i) {
                       tooltip.classed("hidden", true)
                     });
-          }
+            }
           
-          function redraw() {
+           function redraw() {
             width = document.getElementById('container').offsetWidth-60;
             height = width / 2;
             d3.select('svg').remove();
@@ -222,6 +235,7 @@
             draw(topo);
           }
         });
+        
     </script>
   </body>
 </html>
