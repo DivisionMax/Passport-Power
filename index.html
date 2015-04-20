@@ -62,8 +62,11 @@
               else if (income == "lower") {
                 return "#FF8E7A"; //lower middle income
               }
-              else{
+              else if (income == "low") {
                 return "#CC4F39"; //low income
+              }
+              else{
+                return "#FFF"; //unknown GDP
               }
           };
           
@@ -79,8 +82,11 @@
                  else if (numbers[i].gdp_percapita >= lower_middle_income && numbers[i].gdp_percapita < upper_middle_income) {
                    return "lower";
                  }
-                 else{
+                 else if (numbers[i].gdp_percapita < lower_middle_income) {
                    return "low";
+                 }
+                 else{
+                   return "unknown";
                  }
                }
            }   
