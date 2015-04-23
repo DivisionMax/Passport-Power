@@ -11,16 +11,21 @@
           stroke: #fff;
           stroke-width: 1.2px;
         }
+        .text{
+          font-size:10px;
+          text-transform:capitalize;
+        }
         #explanation {
           font-family: Helvetica;
           margin: 10px 10%;
         }
         #container {
           margin:10px 10%;
-          padding:20px;
-          border:2px solid #d0d0d0;
+          border:2px solid #000;
           border-radius: 5px;
           height:100%;
+          overflow:hidden;
+          background: #F0F8FF;
         }
         .hidden {
           display: none;
@@ -34,6 +39,16 @@
           box-shadow: 0px 0px 2px 0px #a6a6a6;
           opacity: 0.9;
           position: absolute;
+        }
+        .graticule {
+          fill: none;
+          stroke: #bbb;
+          stroke-width: .5px;
+          stroke-opacity: .5;
+        }
+        .equator {
+          stroke: #ccc;
+          stroke-width: 1px;
         }
     </style>
   </head>
@@ -52,6 +67,7 @@
     </div>
 
     <div id="container"></div>
+    <div id="canvas"></div>
 
     <script>
         var lower_middle_income;
@@ -59,31 +75,19 @@
         var high_income;
         var avg;
 
-
         d3.json("cleandata.json", function (error, data){
           //Part of the code taken from: http://techslides.com/responsive-d3-map-with-zoom-and-pan-limits
-          d3.select(window).on("resize", throttle);
-
-          var zoom = d3.behavior.zoom()
-              .scaleExtent([1, 8])
-
-          var throttleTimer;
-          function throttle() {
-            window.clearTimeout(throttleTimer);
-              throttleTimer = window.setTimeout(function() {
-                redraw();
-              }, 200);
-          }
-
-          var width = document.getElementById('container').offsetWidth-60;
-          var height = width / 2;
+          var width = document.getElementById('container').offsetWidth;
+          var height = width / 2 + 60;
 
           var topo,projection,path,svg,g;
+          
+          var graticule = d3.geo.graticule();
 
           var tooltip = d3.select("#container").append("div").attr("class", "tooltip hidden");
 
           setup(width,height);
-
+      
           function setup(width,height){
             projection = d3.geo.mercator()
               .translate([0, 0])
@@ -97,7 +101,6 @@
                 .attr("height", height)
                 .append("g")
                 .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
-                .call(zoom);
 
             g = svg.append("g");
           }
@@ -112,7 +115,7 @@
           lower_middle_income = avg * 3/4
           upper_middle_income = avg
           high_income = avg * 1.25
-
+          
           var countryColor = function(income){
             if (income == "high"){
                 return "#1F77B4"; //high income
@@ -297,6 +300,17 @@
           }
 
           function draw(topo) {
+            
+            svg.append("path")
+            .datum(graticule)
+            .attr("class", "graticule")
+            .attr("d", path);
+            
+            g.append("path")
+            .datum({type: "LineString", coordinates: [[-180, 0], [-90, 0], [0, 0], [90, 0], [180, 0]]})
+            .attr("class", "equator")
+            .attr("d", path);
+            
             var country = g.selectAll(".country").data(topo);
 
             country.enter().insert("path")
@@ -316,8 +330,7 @@
                         .classed("hidden", false)
                         .attr("style", "left:"+(mouse[0]+offsetL)+"px;top:"+(mouse[1]+offsetT)+"px")
                         .html(getCountryname(d.id) +
-                              " <br> GDP per Capita: " + getIncome(d.id) +
-                              " <br> Incoming Tourists/Year: " + getIncomingTourists(d.id))
+                              " <br> GDP per Capita: " + getIncome(d.id) )
                     })
                     .on("mouseout",  function(d,i) {
                       tooltip.classed("hidden", true)
