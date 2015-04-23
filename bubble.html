@@ -1,0 +1,166 @@
+<html>
+  <head>
+    <link href='http://fonts.googleapis.com/css?family=Varela' rel='stylesheet' type='text/css'>
+    <!-- Load the d3 library. -->
+    <script src="d3.min.js" charset="utf-8"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="http://d3js.org/topojson.v1.min.js"></script>
+    <style>
+        body { 
+            font-family: 'Varela', sans-serif; 
+            } 
+        div { 
+            margin: 30px; 
+        }
+        svg { border: solid 1px;}
+        .axis path { fill: none; stroke: #777; }
+        .axis line { stroke: #777; }
+    </style>
+  </head>
+  <body>
+    <div id ="explanation2"></div>
+    <div id="canvas"></div>
+    
+    <script>
+        var lower_middle_income;
+        var upper_middle_income;
+        var high_income;
+        var avg;
+
+        d3.json("cleandata.json", function (error, data){
+          //Part of the code taken from: http://techslides.com/responsive-d3-map-with-zoom-and-pan-limits
+          var width = document.getElementById('canvas').offsetWidth;
+          var height = width / 2;
+          
+          var svg2,g2;
+          
+          setup(width,height);
+      
+          function setup(width,height){
+            svg2 = d3.select("#canvas").append("svg")
+                .attr("width", width)
+                .attr("height", height)
+                .append("g")
+                .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
+
+            g2 = svg2.append("g");
+          }
+          
+          numbers = data;
+          maxGDP = d3.max(numbers, function(d) {return d.gdp_percapita});
+          minGDP = d3.min(numbers, function(d) {return d.gdp_percapita});
+          sumGDP = d3.sum(numbers, function(d) {return d.gdp_percapita} ) - maxGDP - minGDP;
+          avg =  sumGDP / (numbers.length - 2);
+
+          lower_middle_income = avg * 3/4
+          upper_middle_income = avg
+          high_income = avg * 1.25
+          
+          var countryColor = function(income){
+            if (income == "high"){
+                return "#1F77B4"; //high income
+              }
+              else if (income == "upper") {
+                return "#2CA02C"; //upper middle income
+              }
+              else if (income == "lower") {
+                return "#FFBB78"; //lower middle income
+              }
+              else if (income == "low") {
+                return "#FF7F0E"; //low income
+              }
+              else{
+                return "#CCC"; //unknown GDP
+              }
+          };
+
+          function getIncomeGroup(code) {
+            for (var i = 0; i < numbers.length; i++) {
+               if (numbers[i].iso3_digit_code == code){
+                 if (numbers[i].gdp_percapita >= high_income) {
+                   return "high";
+                 }
+                 else if (numbers[i].gdp_percapita >= upper_middle_income && numbers[i].gdp_percapita < high_income) {
+                   return "upper";
+                 }
+                 else if (numbers[i].gdp_percapita >= lower_middle_income && numbers[i].gdp_percapita < upper_middle_income) {
+                   return "lower";
+                 }
+                 else if (numbers[i].gdp_percapita < lower_middle_income) {
+                   return "low";
+                 }
+                 else{
+                   return "No Available Data";
+                 }
+               }
+           }
+           return "No Available Data";
+          }
+
+          function getIncome(code) {
+            for (var i = 0; i < numbers.length; i++){
+              if (numbers[i].iso3_digit_code == code){
+                return numbers[i].gdp_percapita;
+              }
+            }
+            return "No Available Data";
+          }
+          
+          //force layout
+          function createGraph() {
+            var graph = {
+                    nodes: [],
+                    links: []
+            };
+            for (var i=0; i < numbers; i++) {
+                    graph.nodes.push(numbers[i]);
+            }
+            return graph;
+          }
+      
+          var lines, circles;
+
+          var force = d3.layout.force()
+		.size([width, height]);
+          
+          graph = createGraph();
+          
+          force.nodes(graph.nodes)
+          .links(graph.links)
+          .start();
+  
+          lines = svg2.selectAll("line")
+          .data(graph.links);
+          
+          lines.enter()
+           .append("line")
+           .attr("class", "link")
+           .attr("stroke", "black");
+   
+          circles = svg2.selectAll("circle")
+           .data(graph.nodes);
+           
+          circles.enter()
+           .append("circle")
+           .attr("class", "node")
+           .attr("r", function(d){ return d.incoming / 2 });
+           
+          circles.style("fill", function (d) {return countryColor(getIncomeGroup(d.id))});
+            
+          circles.call(force.drag);
+   
+          force.on("tick", function() {
+           lines.attr("x1", function(d) { return d.source.x; })
+               .attr("y1", function(d) { return d.source.y; })
+               .attr("x2", function(d) { return d.target.x; })
+               .attr("y2", function(d) { return d.target.y; });
+  
+           circles.attr("cx", function(d) { return d.x; })
+               .attr("cy", function(d) { return d.y; });
+          });
+       
+        });
+    </script>
+  </body>
+</html>
