@@ -41,7 +41,6 @@
           position: absolute;
         }
         .graticule {
-          fill: none;
           stroke: #bbb;
           stroke-width: .5px;
           stroke-opacity: .5;
@@ -50,6 +49,8 @@
           stroke: #ccc;
           stroke-width: 1px;
         }
+
+        svg:hover { fill: blue; opacity: 1.0; font-weight: bold; font-size: xx-large; }
     </style>
   </head>
 
@@ -81,28 +82,31 @@
 
           var topo,projection,path,svg,g;
 
+          var mapfillcolor = "#FFFFCC";
+          var mapstrokecolor = "#993399";
+
           var graticule = d3.geo.graticule();
 
           var tooltip = d3.select("#container").append("div").attr("class", "tooltip hidden");
 
-          setup(width,height);
+          var svg2, g2;
 
-          function setup(width,height){
-            projection = d3.geo.mercator()
-              .translate([0, 0])
-              .scale(width / 2 / Math.PI);
+          var force = d3.layout.force()
+          .charge(-170)
+          .linkDistance(50)
+          .size([width, height]);
 
-            path = d3.geo.path()
-                .projection(projection);
+          var margin = {top: 10, right: 10, bottom: 10, left: 10},
+          width = width - margin.left - margin.right,
+          height = height - margin.top - margin.bottom;
 
-            svg = d3.select("#container").append("svg")
+          svg2 = d3.select("#canvas").append("svg")
                 .attr("width", width)
                 .attr("height", height)
                 .append("g")
-                .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-            g = svg.append("g");
-          }
+          g2 = svg2.append("g");
 
           numbers = data;
 
@@ -111,9 +115,9 @@
           sumGDP = d3.sum(numbers, function(d) {return d.gdp_percapita} ) - maxGDP - minGDP;
           avg =  sumGDP / (numbers.length - 2);
 
-          lower_middle_income = avg * 3/4
-          upper_middle_income = avg
-          high_income = avg * 1.25
+          lower_middle_income = avg * 3/4;
+          upper_middle_income = avg;
+          high_income = avg * 1.25;
 
           var countryColor = function(income){
             if (income == "high"){
@@ -131,7 +135,91 @@
               else{
                 return "#CCC"; //unknown GDP
               }
-          };
+          }
+
+
+          var points = numbers.map(function (country) {
+            return {
+              x: Math.random(),
+              y: Math.random(),
+              name: country["country_name"],
+              incoming: country["incoming"],
+              id: country["iso3_digit_code"]
+            };
+          })
+          .filter(function (point) {
+            return ! isNaN(point.x) && ! isNaN(point.y);
+          });
+
+          var xScale = d3.scale.linear().domain(d3.extent(points, function (point) {return point.x;})).range([50, width - 50]);
+          var yScale = d3.scale.linear().domain(d3.extent(points, function (point) {return point.y;})).range([height - 50, 50]);
+
+          force
+          .nodes(points)
+          .start();
+
+          var node = svg2.selectAll("circle.node")
+          .data(points)
+          .enter()
+          .append("circle")
+          .attr("class", "node")
+          .attr("cx", function(d) { return xScale(d.x); })
+          .attr("cy", function(d) { return yScale(d.y); })
+          .attr("r", "20")
+          .style("fill", function (d) {return countryColor(getIncomeGroup(d.id)); })
+          .style("opacity", 0.5)
+          .call(force.drag);
+
+          var text = svg2.selectAll('text')
+          .data(points)
+          .enter()
+          .append("svg:text")
+          .attr("x", function(d) { return xScale(d.x); })
+          .attr("y", function(d) { return yScale(d.y); })
+          .attr("dy", ".35em")
+          .attr("text-anchor", "middle")
+          .text(function(d) {
+            return d.name;
+          })
+          .attr("font-size", "12px");
+
+          node
+          .on("mouseover", function(d) {
+            d3.select(this)
+            .attr("r", function (d) {
+            if (isNaN(Number(d.incoming))) {
+              return d3.min(d.incoming);
+            }else{
+              return (d.incoming / 500000);
+            }
+            })
+          })
+
+          force.on("tick", function() {
+          text.attr("x", function(d) { return d.x; })
+              .attr("y", function(d) { return d.y; });
+          node.attr("cx", function(d) { return d.x; })
+              .attr("cy", function(d) { return d.y; });
+          });
+
+          setup(width,height);
+
+          function setup(width,height){
+            projection = d3.geo.mercator()
+              .translate([0, 0])
+              .scale(width / 2 / Math.PI);
+
+            path = d3.geo.path()
+                .projection(projection);
+
+            svg = d3.select("#container").append("svg")
+                .attr("width", width)
+                .attr("height", height)
+                .append("g")
+                .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+            g = svg.append("g");
+          }
 
           function getIncomeGroup(code) {
             for (var i = 0; i < numbers.length; i++) {
@@ -198,6 +286,7 @@
           d3.json("world-topo.json", function(error, world) {
             worldData = world;
               // Use topojson to create an array containing one object per country.
+
               var countries = topojson.feature(world, world.objects.countries).features;
               topo = countries;
               draw(topo);
@@ -299,12 +388,14 @@
             .attr("class", "equator")
             .attr("d", path);
 
+
             var country = g.selectAll(".country").data(topo);
 
             country.enter().insert("path")
                 .attr("class", "country")
                 .attr("d", path)
-                .style("fill", function (d) {return "#FEFC4"} );
+                .style("fill", function (d) {return mapfillcolor})
+                .style("stroke", mapstrokecolor);
 
                 //ofsets plus width/height of transform, plsu 20 px of padding, plus 20 extra for tooltip offset off mouse
                 var offsetL = document.getElementById('container').offsetLeft+(width/2)+40;
@@ -351,5 +442,9 @@
 //also have some way of making the initial click country superior somehow
 //also do we have the correct Data for some countries like USA
     </script>
+
+    <div id ="explanation2"></div>
+    <div id="canvas"></div>
+
   </body>
 </html>
