@@ -54,7 +54,7 @@
   </head>
 
   <body>
-    <div id="explanation">
+    <div id = "explanation">
       <h3 style=" font-size: 36px; text-align: center;">Passport Power</h3>
       <p>How many countries can you travel to with your passport? <br>
         Our visualization explores the power of passports. The lines that shoot out from a country when clicked represent
@@ -65,7 +65,6 @@
         The darker the color, the more outgoing tourists.</p>
 
     </div>
-
     <div id="container"></div>
     <div id="canvas"></div>
 
@@ -332,7 +331,7 @@
                         .html(getCountryname(d.id) +
                               " <br> GDP per Capita: " + getIncome(d.id) )
                     })
-                    .on("mouseout",  function(d,i) {
+                    .on("mouseout", function(d,i) {
                       tooltip.classed("hidden", true)
                     });
                 country
