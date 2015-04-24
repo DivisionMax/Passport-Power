@@ -146,6 +146,11 @@
           upper_middle_income = avg;
           high_income = avg * 1.25;
 
+          console.log("avg is " + avg);
+          console.log("lmi is " + lower_middle_income);
+          console.log("umi is " + upper_middle_income);
+          console.log("hi is " + high_income);
+
           var countryColor = function(income){
             if (income == "high"){
                 return "#1F77B4"; //high income
@@ -569,7 +574,7 @@
         .attr("fill","#85FF5C");
 
         svgScale.append("text")
-        .text("0 - 1 Tons of CO2/person/year")
+        .text("GDP Data Unavailable")
         .attr("x",520)
         .attr("y",16);
 
@@ -581,7 +586,7 @@
         .attr("fill","#3D991F");;
 
         svgScale.append("text")
-        .text("1 - 5 Tons of CO2/person/year")
+        .text("The Low GDP per Capita Bracket, GDP per Capita < 13,049 $/Year ")
         .attr("x",520)
         .attr("y",42)
 
@@ -593,7 +598,7 @@
         .attr("fill","#004C00");
 
         svgScale.append("text")
-        .text("5 - 15 Tons of CO2/person/year")
+        .text("The Lower Middle GDP per Capita Bracket, 13,049 $/Year < GDP per Capita < 17,399 $/Year")
         .attr("x",520)
         .attr("y",67)
 
@@ -605,7 +610,7 @@
         .attr("fill","#A35200");
 
         svgScale.append("text")
-        .text("15 - 50 Tons of CO2/person/year")
+        .text("The Upper Middle GDP per Capita Bracket, 17,399 $/Year < GDP per Capita < 21,749 $/Year  ")
         .attr("x",520)
         .attr("y",93)
 
@@ -617,22 +622,11 @@
         .attr("fill","#412100");
 
         svgScale.append("text")
-        .text("50 - 100 Tons of CO2/person/year")
+        .text("The High GDP per Capita Bracket, GDP per Capita > 21,749 $/Year")
         .attr("x",520)
         .attr("y",118)
 
-        svgScale.append("circle")
-        .attr("cx",500)
-        .attr("cy",140)
-        .attr("r",11)
-        .attr("opacity",0.7)
-        .attr("fill","black");
-
-        svgScale.append("text")
-        .text("100+ Tons of CO2/person/year")
-        .attr("x",520)
-        .attr("y",143)
-
+        
 //fix mouseover display
 //only color countries when a connection hits them
 //have thicker demarcations between countries so we can click on them
