@@ -124,10 +124,7 @@
            .data(points)
            .enter()
            .append("g")
-           
-        //circles = g2.selectAll(".point").data(points);
-  
-	// Create a mouseover callback that lists country names
+          
 	circles.append("circle")
           .attr("class", "point")
           .attr("cx", function(d) { return xScale(d.x); })
@@ -141,6 +138,7 @@
           })
           .style("fill", function (d) {return countryColor(getIncomeGroup(d.id)); })
           .style("opacity", 0.5)
+        
         circles.append("text")
           .attr("x", function(d) { return xScale(d.x); })
           .attr("y", function(d) { return yScale(d.y); })
