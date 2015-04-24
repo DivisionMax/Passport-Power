@@ -58,7 +58,6 @@
           stroke: #ccc;
           stroke-width: 1px;
         }
-
     </style>
   </head>
 
@@ -66,30 +65,29 @@
     <div id = "explanation">
       <h3 style=" font-size: 36px; text-align: center;">Passport Power</h3>
       <p>How many countries can you travel to with your passport? <br>
-        Our world map visualization explores the power of passports. Upon clicking, you can see the country being selecte highlight in neon yellow
-        and the lines that shoot out from a country lead to the countries one from the selected country can visit <b>visa-free</b>! Those countries
-        are colored according to their income groups. In particular, blue - high income,
-        green - upper middle, dark orange - lower middle, and light orange - low income. This is also illustrated in the legend below the
-        world map.<br>
-        Upon hovering, you can also explore the names and GDP per Capita of every country in the world.</p>
+        Our visualization explores the power of passports. The lines that shoot out from a country when clicked represent
+        point out the countries you are able to travel to <b>visa-free</b>! <br>
+        Upon clicking, you can see the country name and the region as well as the number of incoming tourists per year to this
+        country. <br>
+        The colors of each line correspond to the nubmer of outgoing tourists from the selected country each year.
+        The darker the color, the more outgoing tourists.</p>
 
     </div>
-    <div id="container"></div>
     <div id="worldLegend"></div>
+    <div id="container"></div>
     <div id="canvas"></div>
     <div id ="explanation2">
 
       <p>
-      The following visualization illustrates each country's GDP per Capita and the number of incoming tourists
-      in the most recent year upon interaction. <br>
       The color of each bubble corresponds to the color of the country on the world map and
-      it represents the income group that country belongs to. The sizes
+      it represents the income group that country belongs to. In particular, blue - high income,
+      green - upper middle, dark orange - lower middle, and light orange - low income. The sizes
       of circles upon hovering, represent the number of incoming tourists in the most recent year.
       <br>
-      In order to help you observe the general trend, the circle sizes stay the same after being
-      hovered over. This design choice makes sure that you can see the full picture by the end. It
-      also engages with you. It hopefully simulates a gaming experience and aims to
-      capture the your attention fully to each and every country.       </p>
+      In order to help the user observe the general trend, the circle sizes stay the same after being
+      hovered over. This design choice makes sure that the user can see the full picture by the end. It
+      also engages with the user. It simulates a gaming experience and aims to
+      capture the user's attention fully to each and every country.       </p>
       </div>
     <div id="canvas2"></div>
 
@@ -108,7 +106,7 @@
           var topo,projection,path,svg,g;
 
           var mapfillcolor = "#CCC";
-          var mapstrokecolor = "#FFF";  
+          var mapstrokecolor = "#FFF";
 
           var graticule = d3.geo.graticule();
 
@@ -146,11 +144,6 @@
           lower_middle_income = avg * 3/4;
           upper_middle_income = avg;
           high_income = avg * 1.25;
-
-          console.log("avg is " + avg);
-          console.log("lmi is " + lower_middle_income);
-          console.log("umi is " + upper_middle_income);
-          console.log("hi is " + high_income);
 
           var countryColor = function(income){
             if (income == "high"){
@@ -392,6 +385,7 @@
                     .attr("y2", projection([country.long, country.lat])[1])
                     .style("stroke", "#00DEB1")
                     .style("stroke-dasharray", ("3, 3"))
+                    .attr("opacity", 0.7)
                     .attr("stroke-width", 1);
 
                      lines.transition().duration(5000)
@@ -411,7 +405,7 @@
                            return countryColor(getIncomeGroup(d.id))
                          }
                          if (d.id == de.id){
-                           return "#F3F315";
+                           return "lightblue";
                          }
                          return mapfillcolor;
                          });
@@ -576,7 +570,7 @@
         .attr("fill","#85FF5C");
 
         svgScale.append("text")
-        .text("GDP Data Unavailable")
+        .text("0 - 1 Tons of CO2/person/year")
         .attr("x",520)
         .attr("y",16);
 
@@ -588,7 +582,7 @@
         .attr("fill","#3D991F");;
 
         svgScale.append("text")
-        .text("The Low GDP per Capita Bracket, GDP per Capita < 13,049 $/Year ")
+        .text("1 - 5 Tons of CO2/person/year")
         .attr("x",520)
         .attr("y",42)
 
@@ -600,7 +594,7 @@
         .attr("fill","#004C00");
 
         svgScale.append("text")
-        .text("The Lower Middle GDP per Capita Bracket, 13,049 $/Year < GDP per Capita < 17,399 $/Year")
+        .text("5 - 15 Tons of CO2/person/year")
         .attr("x",520)
         .attr("y",67)
 
@@ -612,7 +606,7 @@
         .attr("fill","#A35200");
 
         svgScale.append("text")
-        .text("The Upper Middle GDP per Capita Bracket, 17,399 $/Year < GDP per Capita < 21,749 $/Year  ")
+        .text("15 - 50 Tons of CO2/person/year")
         .attr("x",520)
         .attr("y",93)
 
@@ -624,11 +618,22 @@
         .attr("fill","#412100");
 
         svgScale.append("text")
-        .text("The High GDP per Capita Bracket, GDP per Capita > 21,749 $/Year")
+        .text("50 - 100 Tons of CO2/person/year")
         .attr("x",520)
         .attr("y",118)
 
-        
+        svgScale.append("circle")
+        .attr("cx",500)
+        .attr("cy",140)
+        .attr("r",11)
+        .attr("opacity",0.7)
+        .attr("fill","black");
+
+        svgScale.append("text")
+        .text("100+ Tons of CO2/person/year")
+        .attr("x",520)
+        .attr("y",143)
+
 //fix mouseover display
 //only color countries when a connection hits them
 //have thicker demarcations between countries so we can click on them
