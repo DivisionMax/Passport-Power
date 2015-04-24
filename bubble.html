@@ -32,7 +32,17 @@
     </style>
   </head>
   <body>
-    <div id ="explanation2"></div>
+    <div id ="explanation2">
+      The color of each bubble corresponds to the color of the country on the world map and
+      it represents the income group that country belongs to. In particular, blue - high income,
+      green - upper middle, dark orange - lower middle, and light orange - low income. The sizes
+      of circles upon hovering, represent the number of incoming tourists in the most recent year.
+      <br>
+      In order to help the user observe the general trend, the circle sizes stay the same after being 
+      hovered over. This design choice makes sure that the user can see the full picture by the end. It
+      also engages with the user. It simulates a gaming experience and aims to
+      capture the user’s attention fully to each and every country.
+    </div>
     <div id="canvas"></div>
     
     <script>
@@ -43,23 +53,23 @@
         var numbers;
         
       d3.json("cleandata.json", function (error, data){
-          var width = document.getElementById('canvas').offsetWidth;
-          var height = width;
+          var width2 = document.getElementById('canvas').offsetWidth;
+          var height2 = width2;
           
           var svg2, g2;
           
           var force = d3.layout.force()
           .charge(-170)
           .linkDistance(50)
-          .size([width, height]);
+          .size([width2, height2]);
           
           var margin = {top: 10, right: 10, bottom: 10, left: 10},
-          width = width - margin.left - margin.right,
-          height = height - margin.top - margin.bottom;
+          width2 = width2 - margin.left - margin.right,
+          height2 = height2 - margin.top - margin.bottom;
         
           svg2 = d3.select("#canvas").append("svg")
-                .attr("width", width)
-                .attr("height", height)
+                .attr("width", width2)
+                .attr("height", height2)
                 .append("g")
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -138,8 +148,8 @@
             return ! isNaN(point.x) && ! isNaN(point.y);
           });
 
-        var xScale = d3.scale.linear().domain(d3.extent(points, function (point) {return point.x;})).range([50, width - 50]);
-        var yScale = d3.scale.linear().domain(d3.extent(points, function (point) {return point.y;})).range([height - 50, 50]);
+        var xScale = d3.scale.linear().domain(d3.extent(points, function (point) {return point.x;})).range([50, width2 - 50]);
+        var yScale = d3.scale.linear().domain(d3.extent(points, function (point) {return point.y;})).range([height2 - 50, 50]);
         
         force
           .nodes(points)
