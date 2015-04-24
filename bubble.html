@@ -34,16 +34,12 @@
   <body>
     <div id ="explanation2"></div>
     <div id="canvas"></div>
-    <div id = "explanation3"></div>
-    <div id="canvas2"></div>
     
     <script>
         var lower_middle_income;
         var upper_middle_income;
         var high_income;
         var avg;
-        var circles;
-        var xScale, yScale, points;
         var numbers;
         
       d3.json("cleandata.json", function (error, data){
@@ -51,8 +47,6 @@
           var height = width;
           
           var svg2, g2;
-          var padding = 50;
-          var tooltip = d3.select("#canvas2").append("div").attr("class", "tooltip hidden");
           
           var force = d3.layout.force()
           .charge(-170)
@@ -131,7 +125,7 @@
             return "No Available Data";
           }
           
-          points = numbers.map(function (country) {
+          var points = numbers.map(function (country) {
             return {
               x: Math.random(),
               y: Math.random(),
@@ -144,8 +138,8 @@
             return ! isNaN(point.x) && ! isNaN(point.y);
           });
 
-        xScale = d3.scale.linear().domain(d3.extent(points, function (point) {return point.x;})).range([padding, width - padding]);
-        yScale = d3.scale.linear().domain(d3.extent(points, function (point) {return point.y;})).range([height - padding, padding]);
+        var xScale = d3.scale.linear().domain(d3.extent(points, function (point) {return point.x;})).range([50, width - 50]);
+        var yScale = d3.scale.linear().domain(d3.extent(points, function (point) {return point.y;})).range([height - 50, 50]);
         
         force
           .nodes(points)
@@ -194,8 +188,6 @@
           node.attr("cx", function(d) { return d.x; })
               .attr("cy", function(d) { return d.y; });
         });
-        
-        
   });
     </script>
   </body>
